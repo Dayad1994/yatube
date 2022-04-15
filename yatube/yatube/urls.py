@@ -17,7 +17,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.flatpages import views
 
+
 urlpatterns = [
+    # флэтпейдж об автора
+    path('about-author/', views.flatpage, {'url': '/about-author/'},
+         name='about-author'),
+    # флетпейдж о применяемых технологиях
+    path('about-spec/', views.flatpage, {'url': '/about-spec/'},
+         name='about-spec'),
+]
+
+urlpatterns += [
     # раздел администратора
     path('admin/', admin.site.urls),
     # flatpages
@@ -27,11 +37,4 @@ urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
     # импорт из пролижения posts
     path('', include('posts.urls')),
-]
-
-urlpatterns += [
-    path('about-author/', views.flatpage, {'url': '/about-author/'},
-         name='about-author'),
-    path('about-spec/', views.flatpage, {'url': '/about-spec/'},
-         name='about-spec'),
 ]
