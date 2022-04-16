@@ -2,6 +2,7 @@
 {% block title %}Пост № {{ post.pk }} пользователя {{ profile.get_full_name }}{{ group.title }}{% endblock %}
 {% block header %}{% endblock %}
 {% block content %}
+{% load thumbnail %}
     <main role="main" class="container">
         <div class="row">
                 <div class="col-md-3 mb-3 mt-1">
@@ -38,6 +39,9 @@
                     <!-- Начало блока с отдельным постом -->
                         <!-- Пост -->
                         <div class="card mb-3 mt-1 shadow-sm">
+                                {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+                                    <img class="card-img" src="{{ im.url }}">
+                                {% endthumbnail %}
                                 <div class="card-body">
                                         <p class="card-text">
                                                 <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
