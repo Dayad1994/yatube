@@ -22,3 +22,12 @@ class Post(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True,
                               null=True, related_name='group_posts')
     image = models.ImageField(upload_to='posts/', blank=True, null=True)
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True,
+                             null=True, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name='comments')
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)

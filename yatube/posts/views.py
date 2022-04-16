@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
-from .models import Post, Group, User
-from .forms import PostForm
+from .models import Post, Group, User, Comment
+from .forms import PostForm, CommentForm
 
 
 def index(request):
@@ -53,7 +53,31 @@ def profile(request, username):
 def post_view(request, username, post_id):
     profile = get_object_or_404(User, username=username)
     post = Post.objects.get(pk=post_id)
-    return render(request, 'post.html', {'profile': profile, 'post': post})
+    items = Comment.objects.filter(post_id=post_id).order_by('-created').all()
+    flag = False  # флаг формы добавления комментария
+    return render(request, 'post.html', {'profile': profile, 'post': post,
+                                         'items': items, 'flag': flag})
+
+
+def add_comment(request, username, post_id):
+    post = Post.objects.get(pk=post_id)
+    items = Comment.objects.filter(post_id=post_id).order_by('-created').all()
+    flag = True  # флаг формы добавления комментария
+    if request.method == 'POST':
+        form = CommentForm(request.POST or None)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.post = post
+            comment.save()
+            return redirect(f'/{username}/{post_id}/')
+        return render(request, 'post.html', {'profile': post.author,
+                                             'post': post, 'form': form,
+                                             'flag': flag})
+    form = CommentForm()
+    return render(request, 'post.html', {'profile': post.author, 'post': post,
+                                         'form': form, 'items': items,
+                                         'flag': flag})
 
 
 @login_required
