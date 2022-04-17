@@ -23,6 +23,9 @@ class Post(models.Model):
                               null=True, related_name='group_posts')
     image = models.ImageField(upload_to='posts/', blank=True, null=True)
 
+    class Meta:
+        ordering = ['-pub_date']
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True,
@@ -31,3 +34,7 @@ class Comment(models.Model):
                                related_name='comments')
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created']
+
