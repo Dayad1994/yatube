@@ -7,7 +7,7 @@ from .forms import PostForm, CommentForm
 
 
 def index(request):
-    post_list = Post.objects.order_by('-pub_date').all()
+    post_list = Post.objects.all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -17,7 +17,9 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    post_list = Post.objects.filter(group=group).order_by('-pub_date').all()
+    '''post_list = Post.objects.filter(group=group).all()'''
+    post_list = Post.objects.prefetch_related('group').filter(
+        group__exact=group)
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -42,7 +44,8 @@ def new_post(request):
 
 def profile(request, username):
     profile = get_object_or_404(User, username=username)
-    post_list = Post.objects.filter(author=profile).order_by('-pub_date').all()
+    post_list = Post.objects.prefetch_related('author').filter(
+        author__exact=profile)
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -53,7 +56,7 @@ def profile(request, username):
 def post_view(request, username, post_id):
     profile = get_object_or_404(User, username=username)
     post = Post.objects.get(pk=post_id)
-    items = Comment.objects.filter(post_id=post_id).order_by('-created').all()
+    items = Comment.objects.filter(post_id=post_id).all()
     flag = False  # флаг формы добавления комментария
     return render(request, 'post.html', {'profile': profile, 'post': post,
                                          'items': items, 'flag': flag})
@@ -61,7 +64,7 @@ def post_view(request, username, post_id):
 
 def add_comment(request, username, post_id):
     post = Post.objects.get(pk=post_id)
-    items = Comment.objects.filter(post_id=post_id).order_by('-created').all()
+    items = Comment.objects.filter(post_id=post_id).all()
     flag = True  # флаг формы добавления комментария
     if request.method == 'POST':
         form = CommentForm(request.POST or None)
